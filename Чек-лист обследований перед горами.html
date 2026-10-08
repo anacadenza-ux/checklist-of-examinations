@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Чек-лист обследований перед горами</title>
+    <meta charset="UTF-8">
+    <!-- PROTECTED: meta type -->
+    <meta name="type" value="app" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Чек-лист обследований перед горами">
+    <meta property="og:description" content="Печатная карточка медицинского скрининга перед высокогорьем — возьмите её с собой к врачу.">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --bg:#EFEBE4; --paper:#FFFFFF; --ink:#1E1B18; --muted:#6B645C; --line:#E3DDD3;
+            --soft:#F7F4EF; --accent:#A8482A; --accent-soft:#F6E9E3;
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:'Onest',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+        .toolbar{position:sticky;top:0;z-index:10;background:rgba(239,235,228,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+        .toolbar-in{max-width:860px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+        .progress{flex:1;min-width:200px;display:flex;align-items:center;gap:12px;color:var(--muted);font-size:14px}
+        .bar{flex:1;height:6px;background:#DDD6CB;border-radius:6px;overflow:hidden;max-width:220px}
+        .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+        .progress b{color:var(--ink);font-weight:600}
+        .btn{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:10px 16px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.2s}
+        .btn:hover{border-color:#C9C0B3;transform:translateY(-1px)}
+        .btn i{color:var(--muted)}
+        .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+        .btn.primary i{color:#fff}
+        .btn.primary:hover{background:#000}
+
+        .sheet{max-width:860px;margin:32px auto 64px;background:var(--paper);border-radius:18px;padding:56px 60px;border:1px solid var(--line)}
+        .head{display:flex;gap:20px;align-items:flex-start;padding-bottom:28px;border-bottom:2px solid var(--ink)}
+        .logo{width:56px;height:56px;border-radius:14px;background:var(--accent);display:grid;place-items:center;flex-shrink:0}
+        .logo i{color:#fff;font-size:24px}
+        .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700}
+        h1{font-size:32px;line-height:1.15;font-weight:800;letter-spacing:-.02em;margin:4px 0 12px;color:var(--ink)}
+        .lead{color:var(--muted);font-size:15px;max-width:620px}
+
+        .patient{display:grid;grid-template-columns:repeat(4,1fr);gap:16px 20px;padding:24px 0 8px}
+        .field label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:4px}
+        .field input{width:100%;font:inherit;font-size:15px;color:var(--ink);border:none;border-bottom:1px solid #CFC7BB;padding:6px 0;background:transparent;outline:none;transition:border-color .2s}
+        .field input:focus{border-color:var(--accent)}
+        .field.wide{grid-column:span 2}
+
+        .part{margin-top:40px}
+        .part-h{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+        .part-n{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:.06em}
+        h2{font-size:22px;font-weight:700;letter-spacing:-.01em;color:var(--ink)}
+        h2 span{color:var(--muted);font-weight:500}
+        .part-note{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:6px 12px;border-radius:8px;margin:8px 0 4px}
+        .part-note i{color:var(--accent)}
+
+        .item{display:grid;grid-template-columns:28px 1fr;gap:14px;padding:18px 0;border-bottom:1px solid var(--line)}
+        .item:last-child{border-bottom:none}
+        .item h3{font-size:16px;font-weight:700;color:var(--ink)}
+        .item p{font-size:14px;color:var(--muted);margin-top:2px}
+        .item .result{margin-top:10px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
+        .item .result span{flex:1;border-bottom:1px dashed #CFC7BB;height:16px}
+
+        .box{appearance:none;-webkit-appearance:none;width:22px;height:22px;border:1.5px solid #8F877D;border-radius:6px;cursor:pointer;display:grid;place-items:center;transition:.2s;background:#fff;flex-shrink:0;margin-top:1px}
+        .box:hover{border-color:var(--accent)}
+        .box::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) scale(0);margin-top:-3px;transition:transform .2s}
+        .box:checked{background:var(--accent);border-color:var(--accent)}
+        .box:checked::after{transform:rotate(45deg) scale(1)}
+        .box.sm{width:18px;height:18px;border-radius:5px}
+        .box.sm::after{width:5px;height:9px;border-width:0 2px 2px 0}
+
+        .group{margin-top:16px;padding:22px 24px;background:var(--soft);border-radius:14px;border:1px solid var(--line)}
+        .group-h{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+        .group-h i{color:var(--accent);font-size:15px;width:18px;text-align:center}
+        .group-h h3{font-size:16px;font-weight:700;color:var(--ink)}
+        .group-h small{color:var(--muted);font-size:13px;font-weight:500}
+        .why{font-size:13px;color:var(--muted);margin:4px 0 14px 30px}
+        .why b{color:var(--ink);font-weight:600}
+        .chips{display:flex;flex-wrap:wrap;gap:8px}
+        .chip{display:inline-flex;align-items:center;gap:8px;padding:7px 12px 7px 9px;background:#fff;border:1px solid var(--line);border-radius:9px;cursor:pointer;font-size:14px;color:var(--ink);transition:.2s;user-select:none}
+        .chip:hover{border-color:#C9C0B3}
+        .chip.done{color:var(--muted)}
+        .chip.done .t{text-decoration:line-through;text-decoration-color:#B5ADA2}
+        .chip.key{border-color:var(--accent)}
+        .chip .star{color:var(--accent);font-size:10px}
+        .chip em{font-style:normal;color:var(--muted);font-size:12px}
+
+        .notes{margin-top:40px}
+        .notes h2{font-size:18px;margin-bottom:8px}
+        .lines span{display:block;height:34px;border-bottom:1px solid var(--line)}
+
+        .disclaimer{margin-top:40px;display:flex;gap:14px;padding:20px 22px;border:1.5px solid var(--ink);border-radius:14px}
+        .disclaimer i{color:var(--accent);font-size:18px;margin-top:2px}
+        .disclaimer p{font-size:13px;color:var(--muted)}
+        .disclaimer b{color:var(--ink)}
+        .foot{margin-top:20px;display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+
+        @media (max-width:720px){
+            .sheet{padding:32px 22px;margin:16px 12px 40px;border-radius:14px}
+            h1{font-size:26px}
+            .patient{grid-template-columns:1fr 1fr}
+            .head{flex-direction:column}
+            .group{padding:18px 16px}
+            .why{margin-left:0}
+        }
+
+        @page{size:A4;margin:12mm}
+        @media print{
+            *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+            body{background:#fff}
+            .toolbar{display:none}
+            .sheet{margin:0;padding:0;border:none;border-radius:0;max-width:none}
+            h1{font-size:26px}
+            .part{margin-top:24px}
+            .group{break-inside:avoid;padding:14px 16px;margin-top:10px}
+            .item{break-inside:avoid;padding:12px 0}
+            .disclaimer,.notes{break-inside:avoid}
+            .chip{padding:4px 9px 4px 6px;font-size:12.5px}
+            .field input{border-bottom-color:#999}
+            .part-h{break-after:avoid}
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <div class="toolbar-in">
+            <div class="progress">
+                <div class="bar"><i id="bar"></i></div>
+                <span>Отмечено <b id="cnt">0</b> из <b id="total">0</b></span>
+            </div>
+            <button class="btn" id="reset"><i class="fa-solid fa-rotate-left"></i>Сбросить</button>
+            <button class="btn primary" onclick="window.print()"><i class="fa-solid fa-print"></i>Распечатать</button>
+        </div>
+    </div>
+
+    <main class="sheet">
+        <header class="head">
+            <div class="logo"><i class="fa-solid fa-mountain-sun"></i></div>
+            <div>
+                <div class="eyebrow"><i class="fa-solid fa-clipboard-list" style="color:var(--accent)"></i>&nbsp; Медицинский скрининг</div>
+                <h1>Чек-лист обследований перед горами</h1>
+                <p class="lead">Чтобы убедиться, что организм выдержит гипоксию и экстремальные физические нагрузки, необходимо провести базовый медицинский скрининг. Эти обследования покажут реальное состояние вашего сердца, крови, обмена веществ и восстановительных ресурсов.</p>
+            </div>
+        </header>
+
+        <section class="patient">
+            <div class="field wide"><label>ФИО</label><input data-k="name" placeholder=" "></div>
+            <div class="field"><label>Дата рождения</label><input data-k="dob"></div>
+            <div class="field"><label>Дата выезда</label><input data-k="trip"></div>
+            <div class="field wide"><label>Маршрут / вершина</label><input data-k="route"></div>
+            <div class="field"><label>Макс. высота, м</label><input data-k="alt"></div>
+            <div class="field"><label>Дата приёма</label><input data-k="visit"></div>
+        </section>
+
+        <section class="part">
+            <div class="part-h"><span class="part-n">ЧАСТЬ 1</span><h2>Инструментальная диагностика <span>· проверка «мотора»</span></h2></div>
+
+            <div class="item">
+                <input type="checkbox" class="box" data-id="ecg">
+                <div>
+                    <h3>ЭКГ (электрокардиограмма)</h3>
+                    <p>Оценка электрической активности сердца в покое. Идеально — сделать дополнительное ЭКГ под нагрузкой.</p>
+                    <div class="result">Заключение:<span></span></div>
+                </div>
+            </div>
+            <div class="item">
+                <input type="checkbox" class="box" data-id="ecg-load">
+                <div>
+                    <h3>ЭКГ под нагрузкой <span style="color:var(--muted);font-weight:500;font-size:14px">(по возможности)</span></h3>
+                    <p>Нагрузочный тест — показывает реакцию сердца на интенсивную работу.</p>
+                    <div class="result">Заключение:<span></span></div>
+                </div>
+            </div>
+            <div class="item">
+                <input type="checkbox" class="box" data-id="echo">
+                <div>
+                    <h3>УЗИ сердца (эхокардиография)</h3>
+                    <p>Проверка структуры сердца, работы клапанов и насосной функции.</p>
+                    <div class="result">Заключение:<span></span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="part">
+            <div class="part-h"><span class="part-n">ЧАСТЬ 2</span><h2>Лабораторная диагностика <span>· анализы крови</span></h2></div>
+            <div class="part-note"><i class="fa-solid fa-clock"></i>Сдаётся утром, строго натощак</div>
+            <div id="groups"></div>
+        </section>
+
+        <section class="notes">
+            <h2>Заметки врача</h2>
+            <div class="lines"><span></span><span></span><span></span><span></span></div>
+        </section>
+
+        <aside class="disclaimer">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p><b>Медицинский дисклеймер.</b> Данный перечень обследований не является медицинским назначением. Он носит исключительно информационный и рекомендательный характер и не заменяет очную консультацию и клиническое решение врача. Окончательный объём обследований определяет медицинский специалист с учётом ваших жалоб, анамнеза и результатов осмотра.</p>
+        </aside>
+        <div class="foot"><span><i class="fa-solid fa-star" style="color:var(--accent);font-size:9px"></i> — ключевой показатель</span><span>Подпись врача: ____________________</span></div>
+    </main>
+
+    <script>
+        const groups = [
+            {id:'oak', icon:'fa-droplet', title:'Общий анализ крови (ОАК)', sub:'с лейкоцитарной формулой и СОЭ',
+             why:'Показывает базовую способность вашей крови переносить кислород к тканям и исключает скрытые воспалительные процессы.',
+             items:['Гематокрит','Гемоглобин','Эритроциты','MCV','RDW','MCH','MCHC','Тромбоциты','Лейкоциты','Нейтрофилы','Лимфоциты','Моноциты','Эозинофилы','Базофилы','Ретикулоциты','СОЭ']},
+            {id:'bio', icon:'fa-flask', title:'Базовая биохимия', sub:'печень, почки, сосуды',
+             why:'Оценка работы печени, почек, обмена веществ и состояния сосудов.',
+             items:['АЛТ','АСТ',['КФК','маркер мышечного разрушения'],'Общий холестерин','ЛПОНП','ЛПНП','ЛПВП','Мочевина','Креатинин','Общий белок','Глюкоза','Гомоцистеин']},
+            {id:'el', icon:'fa-bolt', title:'Электролиты', sub:'',
+             why:'Защита от судорог и обезвоживания.',
+             items:['Натрий','Кальций','Калий','Магний','Фосфор']},
+            {id:'fe', icon:'fa-magnet', title:'Железный профиль', sub:'',
+             why:'Фундамент акклиматизации.',
+             items:['Железо сывороточное',['Ферритин','запас железа',true],'Трансферрин','ЖСС (железосвязывающая способность)']},
+            {id:'hr', icon:'fa-battery-half', title:'Гормоны и витамины', sub:'',
+             why:'Ресурс и восстановление.',
+             items:[['Кортизол','маркер стресса'],'Тестостерон общий','Витамин D (25-OH)']}
+        ];
+        const KEY='mountain-checklist-v1';
+        const state = JSON.parse(localStorage.getItem(KEY)||'{"c":{},"f":{}}');
+        const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
+
+        const wrap=document.getElementById('groups');
+        wrap.innerHTML = groups.map(g=>`
+            <div class="group">
+                <div class="group-h"><i class="fa-solid ${g.icon}"></i><h3>${g.title}</h3>${g.sub?`<small>· ${g.sub}</small>`:''}</div>
+                <p class="why"><b>Зачем в горах:</b> ${g.why}</p>
+                <div class="chips">${g.items.map((it,i)=>{
+                    const [t,note,key]=Array.isArray(it)?it:[it];
+                    return `<label class="chip${key?' key':''}"><input type="checkbox" class="box sm" data-id="${g.id}-${i}"><span class="t">${t}</span>${note?`<em>${note}</em>`:''}${key?'<i class="fa-solid fa-star star"></i>':''}</label>`;
+                }).join('')}</div>
+            </div>`).join('');
+
+        const boxes=[...document.querySelectorAll('.box')];
+        document.getElementById('total').textContent=boxes.length;
+        const update=()=>{
+            const n=boxes.filter(b=>b.checked).length;
+            document.getElementById('cnt').textContent=n;
+            document.getElementById('bar').style.width=(n/boxes.length*100)+'%';
+            boxes.forEach(b=>{const c=b.closest('.chip'); if(c) c.classList.toggle('done',b.checked);});
+        };
+        boxes.forEach(b=>{
+            b.checked=!!state.c[b.dataset.id];
+            b.addEventListener('change',()=>{state.c[b.dataset.id]=b.checked;save();update();});
+        });
+        document.querySelectorAll('.field input').forEach(inp=>{
+            inp.value=state.f[inp.dataset.k]||'';
+            inp.addEventListener('input',()=>{state.f[inp.dataset.k]=inp.value;save();});
+        });
+        document.getElementById('reset').addEventListener('click',()=>{
+            state.c={};state.f={};save();
+            boxes.forEach(b=>b.checked=false);
+            document.querySelectorAll('.field input').forEach(i=>i.value='');
+            update();
+        });
+        update();
+    </script>
+</body>
+</html>
